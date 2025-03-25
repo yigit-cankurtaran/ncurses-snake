@@ -8,7 +8,7 @@
 #define WIDTH 40
 #define HEIGHT 20
 
-// ISSUES: food can spawn outside of play area, short game over screen
+// ISSUES: short game over screen
 
 int main(int argc, char const *argv[])
 {
@@ -22,8 +22,8 @@ int main(int argc, char const *argv[])
     int x = 10, y = 10; // starting pos
     int tail_x[MAX_LEN], tail_y[MAX_LEN];
     int tail_len = 0;
-    int food_x = rand() % WIDTH + 1;
-    int food_y = rand() % HEIGHT + 1;
+    int food_x = rand() % WIDTH;
+    int food_y = rand() % HEIGHT;
     int ch, direction = KEY_RIGHT; // default start dir
     bool game_over = false;
 
@@ -75,7 +75,7 @@ int main(int argc, char const *argv[])
                 y--;
             break;
         case KEY_DOWN:
-            if (y < 23)
+            if (y < HEIGHT + 1)
                 y++;
             break;
         case KEY_LEFT:
@@ -83,7 +83,7 @@ int main(int argc, char const *argv[])
                 x--;
             break;
         case KEY_RIGHT:
-            if (x < 79)
+            if (x < WIDTH + 1)
                 x++;
             break;
         }
@@ -108,8 +108,8 @@ int main(int argc, char const *argv[])
         {
             tail_len++;
             // new food place
-            food_x = rand() % 80;
-            food_y = rand() % 24;
+            food_x = rand() % WIDTH;
+            food_y = rand() % HEIGHT;
         }
 
         if (tail_len > 0)
@@ -131,7 +131,7 @@ int main(int argc, char const *argv[])
     mvprintw(HEIGHT / 2, WIDTH / 2 - 5, "Game over!");
     mvprintw(HEIGHT / 2, WIDTH / 2 - 10, "score: %d", tail_len);
     refresh();
-    timeout(-1);
+    nodelay(stdscr, FALSE); // force input wait
     getch();
 
     endwin();
