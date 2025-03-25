@@ -8,8 +8,6 @@
 #define WIDTH 40
 #define HEIGHT 20
 
-// ISSUES: short game over screen
-
 int main(int argc, char const *argv[])
 {
     initscr();
@@ -126,12 +124,19 @@ int main(int argc, char const *argv[])
         }
     }
 
-    // game over scren
+    // Game over screen
     clear();
     mvprintw(HEIGHT / 2, WIDTH / 2 - 5, "Game over!");
-    mvprintw(HEIGHT / 2, WIDTH / 2 - 10, "score: %d", tail_len);
+    mvprintw(HEIGHT / 2 + 1, WIDTH / 2 - 5, "score: %d", tail_len);
     refresh();
-    nodelay(stdscr, FALSE); // force input wait
+
+    // RESET INPUT MODE TO NORMAL
+    timeout(-1); // BLOCKING input
+    cbreak();    // Disable halfdelay
+    echo();      // Show what you type
+    flushinp();  // Clear input buffer
+
+    // WAIT FOR KEY
     getch();
 
     endwin();
