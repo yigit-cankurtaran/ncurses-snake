@@ -1,8 +1,14 @@
 #include <ncurses.h>
+
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define MAX_LEN 100
+#define WIDTH 40
+#define HEIGHT 20
+
+// ISSUES: food can spawn outside of play area, short game over screen
 
 int main(int argc, char const *argv[])
 {
@@ -16,13 +22,28 @@ int main(int argc, char const *argv[])
     int x = 10, y = 10; // starting pos
     int tail_x[MAX_LEN], tail_y[MAX_LEN];
     int tail_len = 0;
-    int food_x = rand() % 80;
-    int food_y = rand() % 24;
+    int food_x = rand() % WIDTH + 1;
+    int food_y = rand() % HEIGHT + 1;
     int ch, direction = KEY_RIGHT; // default start dir
+    bool game_over = false;
 
-    while (1)
+    while (!game_over)
     {
-        clear();
+        clear(); // wipe screen before redraw
+
+        // top-bottom walls
+        for (int i = 0; i <= WIDTH + 1; i++)
+        {
+            mvprintw(0, i, "#");
+            mvprintw(HEIGHT + 1, i, "#");
+        }
+        // left-right walls
+        for (int i = 0; i <= HEIGHT + 1; i++)
+        {
+            mvprintw(0, i, "#");
+            mvprintw(i, WIDTH + 1, "#");
+        }
+
         mvprintw(food_y, food_x, "*");
         mvprintw(y, x, "@"); // snake head
         // snake tail
@@ -33,6 +54,9 @@ int main(int argc, char const *argv[])
         refresh();
 
         halfdelay(1); // 100ms for input then move
+        // this is how we move even when we don't press anything
+        // every loop switch(direction) runs and adjusts x or y
+
         ch = getch();
         if (ch == 'q')
             break;
@@ -64,6 +88,21 @@ int main(int argc, char const *argv[])
             break;
         }
 
+        // wall collision
+        if (x <= 0 || x >= WIDTH + 1 || y <= 0 || y >= HEIGHT + 1)
+        {
+            game_over = true;
+        }
+
+        // tail collision
+        for (int i = 0; i < tail_len; i++)
+        {
+            if (x == tail_x[i] && y == tail_y[i])
+            {
+                game_over = true;
+            }
+        }
+
         // eating food
         if (x == food_x && y == food_y)
         {
@@ -86,6 +125,14 @@ int main(int argc, char const *argv[])
             tail_y[tail_len - 1] = prev_y;
         }
     }
+
+    // game over scren
+    clear();
+    mvprintw(HEIGHT / 2, WIDTH / 2 - 5, "Game over!");
+    mvprintw(HEIGHT / 2, WIDTH / 2 - 10, "score: %d", tail_len);
+    refresh();
+    timeout(-1);
+    getch();
 
     endwin();
     return 0;
