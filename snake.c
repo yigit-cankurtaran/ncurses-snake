@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-// BUG: after we eat the food the @ becomes an o
-
 #define MAX_LEN 100
 
 int main(int argc, char const *argv[])
@@ -38,17 +36,13 @@ int main(int argc, char const *argv[])
         ch = getch();
         if (ch == 'q')
             break;
-
-        if (tail_len < MAX_LEN)
-        {
-            tail_x[tail_len] = x;
-            tail_x[tail_len] = y;
-        }
-
         if (ch == KEY_UP || ch == KEY_DOWN || ch == KEY_RIGHT || ch == KEY_LEFT)
         {
             direction = ch;
         }
+
+        // head location before moving
+        int prev_x = x, prev_y = y;
 
         switch (direction)
         {
@@ -78,7 +72,8 @@ int main(int argc, char const *argv[])
             food_x = rand() % 80;
             food_y = rand() % 24;
         }
-        else if (tail_len > 0)
+
+        if (tail_len > 0)
         {
             // shift tail forward
             for (int i = 0; i < tail_len - 1; i++)
@@ -86,8 +81,9 @@ int main(int argc, char const *argv[])
                 tail_x[i] = tail_x[i + 1];
                 tail_y[i] = tail_y[i + 1];
             }
-            tail_x[tail_len - 1] = x;
-            tail_y[tail_len - 1] = y;
+            // tail follows where head was
+            tail_x[tail_len - 1] = prev_x;
+            tail_y[tail_len - 1] = prev_y;
         }
     }
 
