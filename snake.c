@@ -1,5 +1,6 @@
 #include <ncurses.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
@@ -121,6 +122,8 @@ int main(int argc, char const *argv[])
             // tail follows where head was
             tail_x[tail_len - 1] = prev_x;
             tail_y[tail_len - 1] = prev_y;
+
+            printf("tail head position is (%d,%d)", tail_x[tail_len - 1], tail_y[tail_len - 1]);
         }
     }
 
